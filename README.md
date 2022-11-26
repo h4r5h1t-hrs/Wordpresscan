@@ -1,4 +1,6 @@
-# Wordpresscan
+# WPScanPy
+wpscanpy is a fork of swisskyrepo's Wordpresscan package, providing similar functionality. 99% of the work was done by him, and the fork was made because that repository has been archived by the owner so there'll be no new bugfixes and maintenance on the original code.
+
 A simple Wordpress scanner written in python based on the work of WPScan (Ruby version), some features are inspired by WPSeku.
 
 ## Disclaimer
@@ -12,8 +14,8 @@ You agree that you use this software at your own risk.
 
 Install
 ```bash
-git clone https://github.com/swisskyrepo/Wordpresscan.git
-cd Wordpresscan
+git clone https://github.com/h4r5h1t-hrs/WPScanPy.git
+cd WPScanPy
 ```
 
 Virtualenv
@@ -26,7 +28,7 @@ pip install -r requirements.txt
 ## Examples
 ### Example 1 : Basic update and scan of a wordpress
 ```powershell
-python wordpresscan.py -u "http://localhost/wordpress" --update --random-agent
+python wpscanpy.py -u "http://localhost/wordpress" --update --random-agent
 
 -u : Url of the WordPress
 --update : Update the wpscan database
@@ -37,20 +39,20 @@ python wordpresscan.py -u "http://localhost/wordpress" --update --random-agent
 ### Example 2 : Basic bruteforce (option --brute, option --nocheck)
 * bruteforce customs usernames
 ```powershell
-python wordpresscan.py -u "http://127.0.0.1/wordpress/" --brute --usernames "admin,guest" --passwords-list fuzz/wordlist.lst
+python wpscanpy.py -u "http://127.0.0.1/wordpress/" --brute --usernames "admin,guest" --passwords-list fuzz/wordlist.lst
 ```
 * bruteforce with usernames list
 ```powershell
-python wordpresscan.py -u "http://127.0.0.1/wordpress/" --brute --users-list fuzz/wordlist.lst --passwords-list fuzz/wordlist.lst
+python wpscanpy.py -u "http://127.0.0.1/wordpress/" --brute --users-list fuzz/wordlist.lst --passwords-list fuzz/wordlist.lst
 ```
 * bruteforce detected users
 ```
-python wordpresscan.py -u "http://127.0.0.1/wordpress/" --brute --passwords-list fuzz/wordlist.lst
+python wpscanpy.py -u "http://127.0.0.1/wordpress/" --brute --passwords-list fuzz/wordlist.lst
 ```
 
 
 ```powershell
-╭─ 👻 swissky@crashlab: ~/Github/Wordpresscan  ‹master*›
+╭─ 👻 ubuntu@gizmo: ~/Github/WPScanPy  ‹master*›
 ╰─$ python main.py -u "http://127.0.0.1/wordpress/" --brute --users-list fuzz/wordlist.lst --passwords-list fuzz/wordlist.lst --nocheck       
 _______________________________________________________________
  _    _               _                                         
@@ -100,4 +102,4 @@ To enable `wp-json` api you need to change "Permalink" to anything but "simple" 
 
 ## Credits and Contributors
 * Original idea and script from [WPScan Team](https://wpscan.org/)
-* Many PR and bugfixes from [bl4de](https://github.com/bl4de)
+* 99% Word done by [swisskyrepo](https://github.com/swisskyrepo)

@@ -4,7 +4,7 @@ import requests
 import re
 import json
 from random import randint
-from core import *
+from engine.core import *
 
 class Wordpress:
 	url     = "http://wp-example.com"
@@ -17,7 +17,7 @@ class Wordpress:
 	files   = set()
 
 	def __init__(self, url, user_agent, nocheck, max_threads):
-		print info("URL: %s" % url)
+		print(info(f"URL: {url}"))
 		self.url   = url
 		self.agent = user_agent
 		self.max_threads = int(max_threads)
@@ -71,7 +71,7 @@ class Wordpress:
 		self.index = requests.get(self.url, headers={"User-Agent":self.agent}, verify=False)
 		if nocheck == False:
 			if not "wp-" in self.index.text:
-				print critical("Not a WordPress !")
+				print(critical("Not a WordPress !"))
 				exit()
 
 	"""
@@ -82,28 +82,28 @@ class Wordpress:
 		try:
 			r = requests.get(self.url, allow_redirects=False, headers={"User-Agent":self.agent} , verify=False)
 
-	  		if 'location' in r.headers:
-
+			if 'location' in r.headers:
+				
 	  			# Install is not complete
 				if "wp-admin/install.php" in r.headers['location']:
-					print critical("The Website is not fully configured and currently in install mode. Call it to create a new admin user.")
-		  			exit()
+					print(critical("The Website is not fully configured and currently in install mode. Call it to create a new admin user."))
+					exit()
 
 		  		# Redirect
-	  			print notice("The remote host tried to redirect to: %s" % r.headers['location'])
-	  			user_input = str(raw_input("[?] Do you want to follow the redirection ? [Y]es [N]o, "))
+				print(notice("The remote host tried to redirect to: %s" % r.headers['location']))
+				user_input = str(raw_input("[?] Do you want to follow the redirection ? [Y]es [N]o, "))
 
-	  			if user_input.lower() == "y":
+				if user_input.lower() == "y":
 	  				self.url = r.headers['location']
 
-	  			else:
-	  				print critical("Redirection not followed - End of the scan !")
-	  				exit()
+				else:
+					print(critical("Redirection not followed - End of the scan !"))
+					exit()
 
 		except Exception as e:
-			print e
-			print critical("Website down!")
-	  		exit()
+			print(e)
+			print(critical("Website down!"))
+			exit()
 
 
 	"""
@@ -123,7 +123,7 @@ class Wordpress:
 
 			if len(matches) > 0 and matches[0] != None and matches[0] != "":
 				self.version = matches[0]
-				print critical("The Wordpress '%s' file exposing a version number: %s" % (self.url+'readme.html', matches[0]))
+				print(critical("The Wordpress '%s' file exposing a version number: %s" % (self.url+'readme.html', matches[0])))
 
 	"""
 	name        : is_debug_log()
@@ -133,7 +133,7 @@ class Wordpress:
 		r = requests.get(self.url + 'debug.log', headers={"User-Agent":self.agent}, verify=False)
 		if "200" in str(r) and not "404" in r.text :
 			self.files.add('debug.log')
-			print critical( "Debug log file found: %s" % (self.url + 'debug.log') )
+			print(critical( "Debug log file found: %s" % (self.url + 'debug.log')))
 
 
 	"""
@@ -142,33 +142,33 @@ class Wordpress:
 	"""
 	def is_backup_file(self):
 		backup = [
-			'wp-config.php~', 'wp-config.php.save', '.wp-config.php.bck', 
-			'wp-config.php.bck', '.wp-config.php.swp', 'wp-config.php.swp', 
-			'wp-config.php.swo', 'wp-config.php_bak', 'wp-config.bak', 
-			'wp-config.php.bak', 'wp-config.save', 'wp-config.old', 
-			'wp-config.php.old', 'wp-config.php.orig', 'wp-config.orig', 
-			'wp-config.php.original', 'wp-config.original', 'wp-config.txt', 
-			'wp-config.php.txt', 'wp-config.backup', 'wp-config.php.backup', 
-			'wp-config.copy', 'wp-config.php.copy', 'wp-config.tmp', 
-			'wp-config.php.tmp', 'wp-config.zip', 'wp-config.php.zip', 
+			'wp-config.php~', 'wp-config.php.save', '.wp-config.php.bck',
+			'wp-config.php.bck', '.wp-config.php.swp', 'wp-config.php.swp',
+			'wp-config.php.swo', 'wp-config.php_bak', 'wp-config.bak',
+			'wp-config.php.bak', 'wp-config.save', 'wp-config.old',
+			'wp-config.php.old', 'wp-config.php.orig', 'wp-config.orig',
+			'wp-config.php.original', 'wp-config.original', 'wp-config.txt',
+			'wp-config.php.txt', 'wp-config.backup', 'wp-config.php.backup',
+			'wp-config.copy', 'wp-config.php.copy', 'wp-config.tmp',
+			'wp-config.php.tmp', 'wp-config.zip', 'wp-config.php.zip',
 			'wp-config.db', 'wp-config.php.db', 'wp-config.dat',
-			'wp-config.php.dat', 'wp-config.tar.gz', 'wp-config.php.tar.gz', 
-			'wp-config.back', 'wp-config.php.back', 'wp-config.test', 
+			'wp-config.php.dat', 'wp-config.tar.gz', 'wp-config.php.tar.gz',
+			'wp-config.back', 'wp-config.php.back', 'wp-config.test',
 			'wp-config.php.test', "wp-config.php.1","wp-config.php.2",
 			"wp-config.php.3", "wp-config.php._inc", "wp-config_inc",
-			
-			'wp-config.php.SAVE', '.wp-config.php.BCK', 
-			'wp-config.php.BCK', '.wp-config.php.SWP', 'wp-config.php.SWP', 
-			'wp-config.php.SWO', 'wp-config.php_BAK', 'wp-config.BAK', 
-			'wp-config.php.BAK', 'wp-config.SAVE', 'wp-config.OLD', 
-			'wp-config.php.OLD', 'wp-config.php.ORIG', 'wp-config.ORIG', 
-			'wp-config.php.ORIGINAL', 'wp-config.ORIGINAL', 'wp-config.TXT', 
-			'wp-config.php.TXT', 'wp-config.BACKUP', 'wp-config.php.BACKUP', 
-			'wp-config.COPY', 'wp-config.php.COPY', 'wp-config.TMP', 
-			'wp-config.php.TMP', 'wp-config.ZIP', 'wp-config.php.ZIP', 
+
+			'wp-config.php.SAVE', '.wp-config.php.BCK',
+			'wp-config.php.BCK', '.wp-config.php.SWP', 'wp-config.php.SWP',
+			'wp-config.php.SWO', 'wp-config.php_BAK', 'wp-config.BAK',
+			'wp-config.php.BAK', 'wp-config.SAVE', 'wp-config.OLD',
+			'wp-config.php.OLD', 'wp-config.php.ORIG', 'wp-config.ORIG',
+			'wp-config.php.ORIGINAL', 'wp-config.ORIGINAL', 'wp-config.TXT',
+			'wp-config.php.TXT', 'wp-config.BACKUP', 'wp-config.php.BACKUP',
+			'wp-config.COPY', 'wp-config.php.COPY', 'wp-config.TMP',
+			'wp-config.php.TMP', 'wp-config.ZIP', 'wp-config.php.ZIP',
 			'wp-config.DB', 'wp-config.php.DB', 'wp-config.DAT',
-			'wp-config.php.DAT', 'wp-config.TAR.GZ', 'wp-config.php.TAR.GZ', 
-			'wp-config.BACK', 'wp-config.php.BACK', 'wp-config.TEST', 
+			'wp-config.php.DAT', 'wp-config.TAR.GZ', 'wp-config.php.TAR.GZ',
+			'wp-config.BACK', 'wp-config.php.BACK', 'wp-config.TEST',
 			'wp-config.php.TEST', "wp-config.php._INC", "wp-config_INC"
 			]
 
@@ -176,7 +176,7 @@ class Wordpress:
 			r = requests.get(self.url + b, headers={"User-Agent":self.agent}, verify=False)
 			if "200" in str(r) and not "404" in r.text :
 				self.files.add(b)
-				print critical("A wp-config.php backup file has been found in: %s" % (self.url + b) )
+				print(critical("A wp-config.php backup file has been found in: %s" % (self.url + b)))
 
 
 	"""
@@ -187,7 +187,7 @@ class Wordpress:
 		r = requests.get(self.url + "xmlrpc.php", headers={"User-Agent":self.agent}, verify=False)
 		if r.status_code == 405 :
 			self.files.add("xmlrpc.php")
-			print info("XML-RPC Interface available under: %s " % (self.url+"xmlrpc.php") )
+			print(info("XML-RPC Interface available under: %s " % (self.url+"xmlrpc.php")))
 
 
 	"""
@@ -202,7 +202,7 @@ class Wordpress:
 			r = requests.get(self.url + directory, headers={"User-Agent":self.agent}, verify=False)
 			if "Index of" in r.text:
 				self.files.add(directory)
-				print warning("%s directory has directory listing enabled : %s" % (name, self.url + directory))
+				print(warning("%s directory has directory listing enabled : %s" % (name, self.url + directory)))
 
 
 	"""
@@ -213,11 +213,11 @@ class Wordpress:
 		r = requests.get(self.url + "robots.txt", headers={"User-Agent":self.agent}, verify=False)
 		if "200" in str(r) and not "404" in r.text :
 			self.files.add("robots.txt")
-			print info("robots.txt available under: %s " % (self.url+"robots.txt") )
+			print(info("robots.txt available under: %s " % (self.url+"robots.txt")))
 			lines = r.text.split('\n')
 			for l in lines:
 				if "Disallow:" in l:
-					print info("\tInteresting entry from robots.txt: %s" % (l))
+					print(info("\tInteresting entry from robots.txt: %s" % (l)))
 
 	"""
 	name        : is_common_file()
@@ -229,7 +229,7 @@ class Wordpress:
 			r = requests.get(self.url + f, headers={"User-Agent":self.agent}, verify=False)
 			if "200" in str(r) and not "404" in r.text :
 				self.files.add(f)
-				print info("%s available under: %s " % (f, self.url+f) )
+				print(info("%s available under: %s " % (f, self.url+f)))
 
 	"""
 	name        : full_path_disclosure()
@@ -241,7 +241,7 @@ class Wordpress:
 		matches = regex.findall(r)
 
 		if matches != []:
-			print warning("Full Path Disclosure (FPD) in %s exposing %s" % (self.url + "wp-includes/rss-functions.php", matches[0].replace('\n','')) )
+			print(warning("Full Path Disclosure (FPD) in %s exposing %s" % (self.url + "wp-includes/rss-functions.php", matches[0].replace('\n',''))))
 
 
 	"""
@@ -252,10 +252,10 @@ class Wordpress:
 		r = requests.get(self.url + "wp-json/wp/v2/users", headers={"User-Agent":self.agent} , verify=False)
 
 		if "200" in str(r):
-			print notice("Enumerating Wordpress users")
+			print(notice("Enumerating Wordpress users"))
 			users = json.loads(r.text)
 			for user in users:
-				print info("\tIdentified the following user : %s, %s, %s" % (user['id'], user['name'], user['slug']) )
+				print(info("\tIdentified the following user : %s, %s, %s" % (user['id'], user['name'], user['slug'])))
 			self.users = users
 
 
@@ -264,12 +264,12 @@ class Wordpress:
 	description : display a debug view of the object
 	"""
 	def to_string(self):
-		print "--------WORDPRESS----------"
-		print "URL     : %s" % self.url
-		print "Version : %s" % self.version
-		print "Plugins : %s" % self.plugins
-		print "Themes  : %s" % self.themes
-		print "Agent   : %s" % self.agent
-		print "Users   : %s" % self.users
-		print "Files   : %s" % self.files
-		print "---------------------------"
+		print("--------WORDPRESS----------")
+		print("URL     : %s" % self.url)
+		print("Version : %s" % self.version)
+		print("Plugins : %s" % self.plugins)
+		print("Themes  : %s" % self.themes)
+		print("Agent   : %s" % self.agent)
+		print("Users   : %s" % self.users)
+		print("Files   : %s" % self.files)
+		print("---------------------------")

@@ -9,4 +9,4 @@ six==1.11.0
 tornado==4.5.2
 urllib3==1.26.5
 pwntools==4.3.1
-safeurl==0.0.7
+# safeurl==0.0.s7
